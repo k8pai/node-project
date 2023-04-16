@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import React, { Component, useState } from 'react';
+import React, { useState } from 'react';
 import Popup from '../components/Popup';
 import { HiCheck, HiOutlineXMark } from 'react-icons/hi2';
 
-export default function login() {
+export default function Login() {
 	const [state, setState] = useState({
 		username: '',
 		password: '',

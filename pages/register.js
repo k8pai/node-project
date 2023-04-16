@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Popup from '../components/Popup';
 import { HiCheck, HiOutlineXMark } from 'react-icons/hi2';
 
-export default function register() {
+export default function Register() {
 	const [state, setState] = useState({
 		username: '',
 		password: '',
