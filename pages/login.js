@@ -8,11 +8,24 @@ export default function Login() {
 		username: '',
 		password: '',
 	});
+	const [local, setLocal] = useState(
+		JSON.parse(
+			typeof localStorage !== 'undefined' &&
+				localStorage.getItem('node-users'),
+		) || [],
+	);
 	const [pop, setPop] = useState({
 		Component: HiOutlineXMark,
 		message: 'Invalid',
 	});
 	const [popper, setPopper] = useState(false);
+
+	const popup = () => {
+		setPopper(true);
+		setTimeout(() => {
+			setPopper(false);
+		}, 1500);
+	};
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
@@ -22,10 +35,7 @@ export default function Login() {
 				Component: HiOutlineXMark,
 				message: 'Username cannot be empty',
 			});
-			setPopper(true);
-			setTimeout(() => {
-				setPopper(false);
-			}, 1500);
+			popup();
 			return;
 		}
 		if (!password) {
@@ -33,23 +43,29 @@ export default function Login() {
 				Component: HiOutlineXMark,
 				message: 'Password cannot be empty',
 			});
-			setPopper(true);
-			setTimeout(() => {
-				setPopper(false);
-			}, 1500);
+			popup();
 			return;
 		}
 		if (username && password) {
-			console.log('username = ', username, ' password = ', password);
-			setPop({
-				Component: HiCheck,
-				message: 'Logged in successfully!',
-			});
-			setPopper(true);
-			setTimeout(() => {
-				setPopper(false);
-			}, 1500);
-			setState({ username: '', password: '' });
+			const res = local.find(
+				(el) =>
+					username === el.username &&
+					password === window.atob(el.password),
+			);
+			if (res) {
+				setPop({
+					Component: HiCheck,
+					message: 'Logged in successfully!',
+				});
+				setState({ username: '', password: '' });
+			} else {
+				setPop({
+					Component: HiOutlineXMark,
+					message: 'Wrong password, try again!',
+				});
+				setState((el) => ({ ...el, password: '' }));
+			}
+			popup();
 		}
 	};
 
@@ -119,7 +135,6 @@ export default function Login() {
 			</form>
 			<Popup
 				message={pop.message}
-				timer={1500}
 				visible={popper}
 				Component={pop.Component}
 			/>
