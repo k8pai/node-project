@@ -9,6 +9,16 @@ export default function Register() {
 		password: '',
 		confirmPassword: '',
 	});
+	const [local, setLocal] = useState(
+		JSON.parse(
+			typeof localStorage !== 'undefined' &&
+				localStorage.getItem('node-users'),
+		) || [],
+	);
+
+	useEffect(() => {
+		localStorage.setItem('node-users', JSON.stringify(local));
+	}, [local]);
 
 	const handleChange = (event) => {
 		const { name } = event.target;
@@ -21,6 +31,13 @@ export default function Register() {
 	});
 	const [popper, setPopper] = useState(false);
 
+	const popup = () => {
+		setPopper(true);
+		setTimeout(() => {
+			setPopper(false);
+		}, 1500);
+	};
+
 	const handleSubmit = (event) => {
 		event.preventDefault();
 		const { username, password, confirmPassword } = state;
@@ -30,10 +47,7 @@ export default function Register() {
 				Component: HiOutlineXMark,
 				message: 'Username cannot be empty',
 			});
-			setPopper(true);
-			setTimeout(() => {
-				setPopper(false);
-			}, 1500);
+			popup();
 			return;
 		}
 		if (!password) {
@@ -41,10 +55,7 @@ export default function Register() {
 				Component: HiOutlineXMark,
 				message: 'Password cannot be empty',
 			});
-			setPopper(true);
-			setTimeout(() => {
-				setPopper(false);
-			}, 1500);
+			popup();
 			return;
 		}
 		if (!confirmPassword) {
@@ -52,35 +63,28 @@ export default function Register() {
 				Component: HiOutlineXMark,
 				message: 'Confirm your password',
 			});
-			setPopper(true);
-			setTimeout(() => {
-				setPopper(false);
-			}, 1500);
+			popup();
 			return;
 		}
-
 		if (password !== confirmPassword) {
 			setPop({
 				Component: HiOutlineXMark,
 				message: "Passwords doesn't match! Check again!",
 			});
-			setPopper(true);
-			setTimeout(() => {
-				setPopper(false);
-			}, 1500);
+			popup();
 			return;
 		}
-
 		if (username && password && password === confirmPassword) {
 			console.log('submission is acceptable!');
+			setLocal((reference) => [
+				...reference,
+				{ username, password: window.btoa(password) },
+			]);
 			setPop({
 				Component: HiCheck,
 				message: 'Successfully Registered!',
 			});
-			setPopper(true);
-			setTimeout(() => {
-				setPopper(false);
-			}, 1500);
+			popup();
 			setState({ username: '', password: '', confirmPassword: '' });
 		}
 	};
@@ -163,7 +167,6 @@ export default function Register() {
 			</form>
 			<Popup
 				message={pop.message}
-				timer={1500}
 				visible={popper}
 				Component={pop.Component}
 			/>
