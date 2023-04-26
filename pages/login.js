@@ -27,7 +27,7 @@ export default function Login() {
 		}, 1500);
 	};
 
-	const handleSubmit = (event) => {
+	const handleSubmit = async (event) => {
 		event.preventDefault();
 		const { username, password } = state;
 		if (!username) {
@@ -58,6 +58,13 @@ export default function Login() {
 					message: 'Logged in successfully!',
 				});
 				setState({ username: '', password: '' });
+				await fetch('/api/login', {
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					method: 'POST',
+					body: JSON.stringify({ username, password }),
+				});
 			} else {
 				setPop({
 					Component: HiOutlineXMark,
