@@ -2,6 +2,7 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import Popup from '../components/Popup';
 import { HiCheck, HiOutlineXMark } from 'react-icons/hi2';
+import { isUser } from '../lib/helpers';
 
 export default function Login() {
 	const [state, setState] = useState({
@@ -47,32 +48,40 @@ export default function Login() {
 			return;
 		}
 		if (username && password) {
-			const res = local.find(
-				(el) =>
-					username === el.username &&
-					password === window.atob(el.password),
-			);
-			if (res) {
-				setPop({
-					Component: HiCheck,
-					message: 'Logged in successfully!',
+			await isUser(username, password)
+				.then((data) => {
+					if (!data) {
+						setPop({
+							Component: HiOutlineXMark,
+							message: 'Wrong password, try again!',
+						});
+						setState((el) => ({ ...el, password: '' }));
+						popup();
+					} else {
+						setPop({
+							Component: HiCheck,
+							message: 'Logged in successfully!',
+						});
+						setState({ username: '', password: '' });
+						popup();
+					}
+				})
+				.catch((err) => {
+					console.log(err);
 				});
-				setState({ username: '', password: '' });
-				await fetch('/api/login', {
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					method: 'POST',
-					body: JSON.stringify({ username, password }),
-				});
-			} else {
-				setPop({
-					Component: HiOutlineXMark,
-					message: 'Wrong password, try again!',
-				});
-				setState((el) => ({ ...el, password: '' }));
-			}
-			popup();
+			// if (isUser(username, password)) {
+			// 	setPop({
+			// 		Component: HiCheck,
+			// 		message: 'Logged in successfully!',
+			// 	});
+			// 	setState({ username: '', password: '' });
+			// } else {
+			// 	setPop({
+			// 		Component: HiOutlineXMark,
+			// 		message: 'Wrong password, try again!',
+			// 	});
+			// 	setState((el) => ({ ...el, password: '' }));
+			// }
 		}
 	};
 

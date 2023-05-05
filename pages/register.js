@@ -38,7 +38,7 @@ export default function Register() {
 		}, 1500);
 	};
 
-	const handleSubmit = (event) => {
+	const handleSubmit = async (event) => {
 		event.preventDefault();
 		const { username, password, confirmPassword } = state;
 
@@ -76,6 +76,13 @@ export default function Register() {
 		}
 		if (username && password && password === confirmPassword) {
 			console.log('submission is acceptable!');
+			await fetch('/api/register', {
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				method: 'POST',
+				body: JSON.stringify({ username, password }),
+			});
 			setLocal((reference) => [
 				...reference,
 				{ username, password: window.btoa(password) },
